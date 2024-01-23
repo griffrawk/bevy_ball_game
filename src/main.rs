@@ -17,8 +17,9 @@ fn main() {
         .add_systems(Update, player_movement)
         .add_systems(Update, confine_player_movement)
         .add_systems(Update, enemy_movement)
-        .add_systems(Update, update_enemy_direction)
         .add_systems(Update, confine_enemy_movement)
+        .add_systems(Update, update_enemy_direction)    // order is important apparently!
+        .add_systems(Update, enemy_hit_player)    // order is important apparently!
         .run();
 }
 
@@ -69,12 +70,13 @@ pub fn spawn_enemies(
 
         commands.spawn((
             SpriteBundle {
-                // middle of window
+                // randomly in window
                 transform: Transform::from_xyz(random_x, random_y, 0.0),
                 texture: asset_server.load("sprites/ball_red_large.png"),
                 ..default()
             },
             Enemy {
+                // initial random direction of this enemy
                 direction: Vec2::new(random::<f32>(), random::<f32>()).normalize(),
             },
         ));
@@ -149,7 +151,7 @@ pub fn enemy_movement(mut enemy_query: Query<(&mut Transform, &Enemy)>, time: Re
 }
 
 pub fn update_enemy_direction(
-    mut commands: Commands,             // needed for the sfx since 0.10
+    mut commands: Commands,             // needed for the sfx since 0.1?
     mut enemy_query: Query<(&Transform, &mut Enemy)>,       // tuple
     window_query: Query<&Window, With<PrimaryWindow>>,      // filtered
     // audio: Res<AudioSource>,         // old doesn't work
@@ -178,6 +180,7 @@ pub fn update_enemy_direction(
 
         // play sfx
         if direction_changed {
+            // pick a random pluck
             let sound_effect_1 = asset_server.load("audio/pluck_001.ogg");
             let sound_effect_2 = asset_server.load("audio/pluck_002.ogg");
             let sound_effect = if random::<f32>() > 0.5 {
@@ -195,6 +198,10 @@ pub fn update_enemy_direction(
     }
 }
 
+// Comments on the video infer this could be done in a more agnostic way, such that you
+// make a confined struct spawned on both Player and Enemy, rather than have the two...
+// Not sure how to do that but an exercise. Jacques decided not to do that to make it 
+// beginner friendly.
 pub fn confine_enemy_movement(
     mut enemy_query: Query<&mut Transform, With<Enemy>>,    // filtered. Transform for an Enemy
     window_query: Query<&mut Window, With<PrimaryWindow>>,
@@ -222,5 +229,32 @@ pub fn confine_enemy_movement(
             translation.y = y_max;
         }
         enemy_transform.translation = translation;
+    }
+}
+
+pub fn enemy_hit_player(
+    mut commands: Commands,
+    // Entity is just a u32 so it can be copied...!
+    mut player_query: Query<(Entity, &Transform), With<Player>>,
+    enemy_query: Query<&Transform, With<Enemy>>,
+    asset_server: Res<AssetServer>,
+){
+    if let Ok((player_entity, player_transform)) = player_query.get_single_mut() {
+        // check each enemy to see if in collision with player
+        for enemy_transform in enemy_query.iter() {
+            let distance = player_transform.translation.distance(enemy_transform.translation);
+            let player_radius = PLAYER_SIZE / 2.0;
+            let enemy_radius = ENEMY_SIZE / 2.0;
+            if distance < player_radius + enemy_radius {
+                println!("Enemy hit player! Game Over!");
+                let sound_effect = asset_server.load("audio/explosionCrunch_000.ogg");
+                commands.spawn(AudioBundle{
+                    source: sound_effect,
+                    settings: PlaybackSettings::DESPAWN, 
+                    ..default() 
+                });
+                commands.entity(player_entity).despawn();
+            }
+        }
     }
 }
