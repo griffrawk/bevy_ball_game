@@ -1,3 +1,5 @@
+// bevy_ball_game
+
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use rand::prelude::*;
@@ -9,6 +11,8 @@ pub const ENEMY_SPEED: f32 = 200.0;
 pub const ENEMY_SIZE: f32 = 64.0;
 
 fn main() {
+    // All the systems are added very verbosely, but they can be grouped, and can be conditional as well.
+    // It's happened like this because of the evolvment of the videos they are taken from.
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, spawn_camera)
@@ -76,7 +80,8 @@ pub fn spawn_enemies(
                 ..default()
             },
             Enemy {
-                // initial random direction of this enemy
+                // Initial random direction of this enemy, though would appear to be in +ve x / y
+                // direction initially. Maybe that's the .normalize() ??
                 direction: Vec2::new(random::<f32>(), random::<f32>()).normalize(),
             },
         ));
@@ -243,9 +248,11 @@ pub fn enemy_hit_player(
         // check each enemy to see if in collision with player
         for enemy_transform in enemy_query.iter() {
             let distance = player_transform.translation.distance(enemy_transform.translation);
+            // Hopefully these are inlined by the compiler...
             let player_radius = PLAYER_SIZE / 2.0;
             let enemy_radius = ENEMY_SIZE / 2.0;
             if distance < player_radius + enemy_radius {
+                // Player 1 Go Boom...
                 println!("Enemy hit player! Game Over!");
                 let sound_effect = asset_server.load("audio/explosionCrunch_000.ogg");
                 commands.spawn(AudioBundle{
