@@ -1,4 +1,4 @@
-// bevy_ball_game
+// bevy_ball_game - Jacques
 
 use bevy::app::AppExit;
 use bevy::prelude::*;
@@ -18,6 +18,7 @@ const ENEMY_SPAWN_TIME: f32 = 5.0;
 fn main() {
     // All the systems are added very verbosely, but they can be grouped, and can be conditional as well.
     // It's happened like this because of the evolvment of the videos they are taken from.
+    // Coming soon (ep8), the big refactor.
     App::new()
         .add_plugins(DefaultPlugins)
         .init_resource::<Score>()
@@ -40,7 +41,9 @@ fn main() {
         // .add_systems(Update, tick_star_spawn_timer)
         .add_systems(Update, spawn_enemies_over_time)
         .add_systems(Update, spawn_stars_over_time)
-        .add_systems(Update, exit_game)
+        .add_systems(Update, bevy::window::close_on_esc) 
+        // or...
+        // .add_systems(Update, exit_game)
         .add_systems(Update, handle_game_over)
         .run();
 }
@@ -286,12 +289,10 @@ fn update_enemy_direction(
         // play sfx
         if direction_changed {
             // pick a random pluck
-            let sound_effect_1 = asset_server.load("audio/pluck_001.ogg");
-            let sound_effect_2 = asset_server.load("audio/pluck_002.ogg");
             let sound_effect = if random::<f32>() > 0.5 {
-                sound_effect_1
+                asset_server.load("audio/pluck_001.ogg")
             } else {
-                sound_effect_2
+                asset_server.load("audio/pluck_002.ogg")
             };
             // audio.play(sound_effect);        // old doesn't work
             commands.spawn(AudioBundle {
@@ -507,6 +508,7 @@ fn can_i_do_this(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
+#[allow(unused)]
 fn exit_game(keyboard_input: Res<Input<KeyCode>>, mut app_exit_event_writer: EventWriter<AppExit>) {
     if keyboard_input.just_pressed(KeyCode::Escape) {
         app_exit_event_writer.send(AppExit);
