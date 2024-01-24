@@ -1,5 +1,6 @@
 // bevy_ball_game
 
+use bevy::app::AppExit;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use rand::prelude::*;
@@ -12,6 +13,7 @@ const ENEMY_SIZE: f32 = 64.0;
 const NUMBER_OF_STARS: usize = 10;
 const STAR_SIZE: f32 = 30.0;
 const STAR_SPAWN_TIME: f32 = 1.0;
+const ENEMY_SPAWN_TIME: f32 = 5.0;
 
 fn main() {
     // All the systems are added very verbosely, but they can be grouped, and can be conditional as well.
@@ -20,6 +22,8 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .init_resource::<Score>()
         .init_resource::<StarSpawnTimer>()
+        .init_resource::<EnemySpawnTimer>()
+        .add_event::<GameOver>()
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_enemies)
@@ -34,7 +38,10 @@ fn main() {
         .add_systems(Update, player_catch_star)
         .add_systems(Update, update_score)
         // .add_systems(Update, tick_star_spawn_timer)
+        .add_systems(Update, spawn_enemies_over_time)
         .add_systems(Update, spawn_stars_over_time)
+        .add_systems(Update, exit_game)
+        .add_systems(Update, handle_game_over)
         .run();
 }
 
@@ -88,6 +95,24 @@ impl Default for StarSpawnTimer {
     }
 }
 
+#[derive(Resource)]
+struct EnemySpawnTimer {
+    timer: Timer,
+}
+
+impl Default for EnemySpawnTimer {
+    fn default() -> Self {
+        Self {
+            timer: Timer::from_seconds(ENEMY_SPAWN_TIME, TimerMode::Repeating),
+        }
+    }
+}
+
+#[derive(Event)]
+struct GameOver {
+    score: u32,
+}
+
 fn spawn_player(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -114,6 +139,7 @@ fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<Primar
     });
 }
 
+#[allow(unused)]
 fn spawn_enemies(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -137,6 +163,7 @@ fn spawn_enemies(
     }
 }
 
+#[allow(unused)]
 fn spawn_stars(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -338,10 +365,12 @@ fn confine_sprite_movement(
 
 fn enemy_hit_player(
     mut commands: Commands,
+    mut game_over_event_writer: EventWriter<GameOver>,
     // Entity is just a u32 so it can be copied, not borrowed.
     player_query: Query<(Entity, &Transform), With<Player>>,
     enemy_query: Query<&Transform, With<Enemy>>,
     asset_server: Res<AssetServer>,
+    score: Res<Score>,
 ) {
     if let Ok((player_entity, player_transform)) = player_query.get_single() {
         // check each enemy to see if in collision with player
@@ -354,14 +383,17 @@ fn enemy_hit_player(
             let enemy_radius = ENEMY_SIZE / 2.0;
             if distance < player_radius + enemy_radius {
                 println!("Enemy hit player! Game Over!");
-                let sound_effect = asset_server.load("audio/explosionCrunch_000.ogg");
+                // let sound_effect = asset_server.load("audio/explosionCrunch_000.ogg");
                 commands.spawn(AudioBundle {
-                    source: sound_effect,
+                    source: asset_server.load("audio/explosionCrunch_000.ogg"),
+                    // source: sound_effect,
                     settings: PlaybackSettings::DESPAWN,
                     ..default()
                 });
                 // Player 1 Go Boom...
                 commands.entity(player_entity).despawn();
+                // send final score to whatever system is listening for GameOver
+                game_over_event_writer.send(GameOver { score: score.value });
             }
         }
     }
@@ -387,9 +419,10 @@ fn player_catch_star(
             if distance < player_radius + star_radius {
                 println!("Player hit star!");
                 score.value += 1;
-                let sound_effect = asset_server.load("audio/laserLarge_000.ogg");
+                // let sound_effect = asset_server.load("audio/laserLarge_000.ogg");
                 commands.spawn(AudioBundle {
-                    source: sound_effect,
+                    source: asset_server.load("audio/laserLarge_000.ogg"),
+                    // source: sound_effect,
                     settings: PlaybackSettings::DESPAWN,
                     ..default()
                 });
@@ -402,14 +435,16 @@ fn player_catch_star(
 
 fn update_score(score: Res<Score>) {
     if score.is_changed() {
-        println!("Score: {}", score.value.to_string());
+        println!("Score: {}", score.value);
     }
 }
 
-// fn tick_star_spawn_timer(mut star_spawn_timer: ResMut<StarSpawnTimer>, time: Res<Time>) {
-    // star_spawn_timer.timer.tick(time.delta());
-// }
+#[allow(unused)]
+fn tick_star_spawn_timer(mut star_spawn_timer: ResMut<StarSpawnTimer>, time: Res<Time>) {
+    star_spawn_timer.timer.tick(time.delta());
+}
 
+// Combined the tick system into this system...
 fn spawn_stars_over_time(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -417,8 +452,9 @@ fn spawn_stars_over_time(
     mut star_spawn_timer: ResMut<StarSpawnTimer>,
     time: Res<Time>,
 ) {
-    star_spawn_timer.timer.tick(time.delta());
-    if star_spawn_timer.timer.finished() {
+    // star_spawn_timer.timer.tick(time.delta());
+    // if star_spawn_timer.timer.finished() {
+    if star_spawn_timer.timer.tick(time.delta()).finished() {
         let window = window_query.get_single().unwrap();
         let random_x = random::<f32>() * window.width();
         let random_y = random::<f32>() * window.height();
@@ -432,10 +468,34 @@ fn spawn_stars_over_time(
             Star {},
         ));
 
-        can_i_do_this(commands, asset_server); // yes I can
+        // can_i_do_this(commands, asset_server); // yes I can
     }
 }
 
+fn spawn_enemies_over_time(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+    mut enemy_spawn_timer: ResMut<EnemySpawnTimer>,
+    time: Res<Time>,
+) {
+    if enemy_spawn_timer.timer.tick(time.delta()).finished() {
+        let window = window_query.get_single().unwrap();
+        let random_x = random::<f32>() * window.width();
+        let random_y = random::<f32>() * window.height();
+
+        commands.spawn((
+            SpriteBundle {
+                transform: Transform::from_xyz(random_x, random_y, 0.0),
+                texture: asset_server.load("sprites/ball_red_large.png"),
+                ..default()
+            },
+            Enemy::default(),
+        ));
+    }
+}
+
+#[allow(unused)]
 fn can_i_do_this(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         SpriteBundle {
@@ -445,4 +505,16 @@ fn can_i_do_this(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         LockBlock {},
     ));
+}
+
+fn exit_game(keyboard_input: Res<Input<KeyCode>>, mut app_exit_event_writer: EventWriter<AppExit>) {
+    if keyboard_input.just_pressed(KeyCode::Escape) {
+        app_exit_event_writer.send(AppExit);
+    }
+}
+
+fn handle_game_over(mut game_over_event_reader: EventReader<GameOver>) {
+    for event in game_over_event_reader.read() {
+        println!("Final Score: {}", event.score);
+    }
 }
