@@ -9,21 +9,31 @@ pub const PLAYER_SIZE: f32 = 64.0;
 pub const NUMBER_OF_ENEMIES: usize = 4;
 pub const ENEMY_SPEED: f32 = 200.0;
 pub const ENEMY_SIZE: f32 = 64.0;
+pub const NUMBER_OF_STARS: usize = 10;
+pub const STAR_SIZE: f32 = 30.0;
+pub const STAR_SPAWN_TIME: f32 = 1.0;
 
 fn main() {
     // All the systems are added very verbosely, but they can be grouped, and can be conditional as well.
     // It's happened like this because of the evolvment of the videos they are taken from.
     App::new()
         .add_plugins(DefaultPlugins)
+        .init_resource::<Score>()
+        .init_resource::<StarSpawnTimer>()
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_enemies)
+        .add_systems(Startup, spawn_stars)
         .add_systems(Update, player_movement)
         .add_systems(Update, confine_player_movement)
         .add_systems(Update, enemy_movement)
         .add_systems(Update, confine_enemy_movement)
-        .add_systems(Update, update_enemy_direction)    // order is important apparently!
-        .add_systems(Update, enemy_hit_player)    // order is important apparently!
+        .add_systems(Update, update_enemy_direction) 
+        .add_systems(Update, enemy_hit_player) 
+        .add_systems(Update, player_catch_star) 
+        .add_systems(Update, update_score) 
+        .add_systems(Update, tick_star_spawn_timer) 
+        .add_systems(Update, spawn_stars_over_time) 
         .run();
 }
 
@@ -33,6 +43,33 @@ pub struct Player {}
 #[derive(Component)]
 pub struct Enemy {
     pub direction: Vec2,
+}
+
+#[derive(Component)]
+pub struct Star {}
+
+#[derive(Resource)]
+pub struct Score {
+    pub value: u32,
+}
+
+impl Default for Score {
+    fn default() -> Score {
+        Score { value: 0 }
+    }
+}
+
+#[derive(Resource)]
+pub struct StarSpawnTimer {
+    pub timer: Timer,
+}
+
+impl Default for StarSpawnTimer {
+    fn default() -> StarSpawnTimer {
+        StarSpawnTimer {
+            timer: Timer::from_seconds(STAR_SPAWN_TIME, TimerMode::Repeating),
+        }
+    }
 }
 
 pub fn spawn_player(
@@ -84,6 +121,29 @@ pub fn spawn_enemies(
                 // direction initially. Maybe that's the .normalize() ??
                 direction: Vec2::new(random::<f32>(), random::<f32>()).normalize(),
             },
+        ));
+    }
+}
+
+pub fn spawn_stars(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+) {
+    let window = window_query.get_single().unwrap();
+    // randomly spread around
+    for _ in 0..NUMBER_OF_STARS {
+        let random_x = random::<f32>() * window.width();
+        let random_y = random::<f32>() * window.height();
+
+        commands.spawn((
+            SpriteBundle {
+                // randomly in window
+                transform: Transform::from_xyz(random_x, random_y, 0.0),
+                texture: asset_server.load("sprites/star.png"),
+                ..default()
+            },
+            Star {},
         ));
     }
 }
@@ -156,9 +216,9 @@ pub fn enemy_movement(mut enemy_query: Query<(&mut Transform, &Enemy)>, time: Re
 }
 
 pub fn update_enemy_direction(
-    mut commands: Commands,             // needed for the sfx since 0.1?
-    mut enemy_query: Query<(&Transform, &mut Enemy)>,       // tuple
-    window_query: Query<&Window, With<PrimaryWindow>>,      // filtered
+    mut commands: Commands, // needed for the sfx since 0.1?
+    mut enemy_query: Query<(&Transform, &mut Enemy)>, // tuple
+    window_query: Query<&Window, With<PrimaryWindow>>, // filtered
     // audio: Res<Audio>,         // old doesn't work
     asset_server: Res<AssetServer>,
 ) {
@@ -194,10 +254,10 @@ pub fn update_enemy_direction(
                 sound_effect_2
             };
             // audio.play(sound_effect);        // old doesn't work
-            commands.spawn(AudioBundle{
-              source: sound_effect,
-              settings: PlaybackSettings::DESPAWN, 
-              ..default() 
+            commands.spawn(AudioBundle {
+                source: sound_effect,
+                settings: PlaybackSettings::DESPAWN,
+                ..default()
             });
         }
     }
@@ -205,10 +265,10 @@ pub fn update_enemy_direction(
 
 // Comments on the video infer this could be done in a more agnostic way, such that you
 // make a confined struct spawned on both Player and Enemy, rather than have the two...
-// Not sure how to do that but an exercise. Jacques decided not to do that to make it 
+// Not sure how to do that but an exercise. Jacques decided not to do that to make it
 // beginner friendly.
 pub fn confine_enemy_movement(
-    mut enemy_query: Query<&mut Transform, With<Enemy>>,    // filtered. Transform for an Enemy
+    mut enemy_query: Query<&mut Transform, With<Enemy>>, // filtered. Transform for an Enemy
     window_query: Query<&mut Window, With<PrimaryWindow>>,
 ) {
     // todo If the screen dimensions change then the bounds don't behave correctly for
@@ -239,29 +299,98 @@ pub fn confine_enemy_movement(
 
 pub fn enemy_hit_player(
     mut commands: Commands,
-    // Entity is just a u32 so it can be copied...!
+    // Entity is just a u32 so it can be copied, not borrowed.
     mut player_query: Query<(Entity, &Transform), With<Player>>,
     enemy_query: Query<&Transform, With<Enemy>>,
     asset_server: Res<AssetServer>,
-){
+) {
     if let Ok((player_entity, player_transform)) = player_query.get_single_mut() {
         // check each enemy to see if in collision with player
         for enemy_transform in enemy_query.iter() {
-            let distance = player_transform.translation.distance(enemy_transform.translation);
+            let distance = player_transform
+                .translation
+                .distance(enemy_transform.translation);
             // Hopefully these are inlined by the compiler...
             let player_radius = PLAYER_SIZE / 2.0;
             let enemy_radius = ENEMY_SIZE / 2.0;
             if distance < player_radius + enemy_radius {
-                // Player 1 Go Boom...
                 println!("Enemy hit player! Game Over!");
                 let sound_effect = asset_server.load("audio/explosionCrunch_000.ogg");
-                commands.spawn(AudioBundle{
+                commands.spawn(AudioBundle {
                     source: sound_effect,
-                    settings: PlaybackSettings::DESPAWN, 
-                    ..default() 
+                    settings: PlaybackSettings::DESPAWN,
+                    ..default()
                 });
+                // Player 1 Go Boom...
                 commands.entity(player_entity).despawn();
             }
         }
+    }
+}
+
+pub fn player_catch_star(
+    mut commands: Commands,
+    // Entity is just a u32 so it can be copied...!
+    mut player_query: Query<&Transform, With<Player>>,
+    star_query: Query<(Entity, &Transform), With<Star>>,
+    asset_server: Res<AssetServer>,
+    mut score: ResMut<Score>,
+) {
+    if let Ok(player_transform) = player_query.get_single_mut() {
+        // check each star to see if in collision with player
+        for (star_entity, star_transform) in star_query.iter() {
+            let distance = player_transform
+                .translation
+                .distance(star_transform.translation);
+            // Hopefully these are inlined by the compiler...
+            let player_radius = PLAYER_SIZE / 2.0;
+            let star_radius = STAR_SIZE / 2.0;
+            if distance < player_radius + star_radius {
+                println!("Player hit star!");
+                score.value += 1;
+                let sound_effect = asset_server.load("audio/laserLarge_000.ogg");
+                commands.spawn(AudioBundle {
+                    source: sound_effect,
+                    settings: PlaybackSettings::DESPAWN,
+                    ..default()
+                });
+                // Catch a falling star
+                commands.entity(star_entity).despawn();
+            }
+        }
+    }
+}
+
+pub fn update_score(score: Res<Score>) {
+    if score.is_changed() {
+        println!("Score: {}", score.value.to_string());
+    }
+}
+
+pub fn tick_star_spawn_timer(mut star_spawn_timer: ResMut<StarSpawnTimer>, time: Res<Time>) {
+    star_spawn_timer.timer.tick(time.delta());
+}
+
+pub fn spawn_stars_over_time(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+    star_spawn_timer: Res<StarSpawnTimer>,
+){
+    if star_spawn_timer.timer.finished() {
+        let window = window_query.get_single().unwrap();
+        // randomly spread around
+        let random_x = random::<f32>() * window.width();
+        let random_y = random::<f32>() * window.height();
+    
+        commands.spawn((
+            SpriteBundle {
+                // randomly in window
+                transform: Transform::from_xyz(random_x, random_y, 0.0),
+                texture: asset_server.load("sprites/star.png"),
+                ..default()
+            },
+            Star {},
+        ));
     }
 }
