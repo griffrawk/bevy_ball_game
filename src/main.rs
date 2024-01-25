@@ -41,7 +41,7 @@ fn main() {
         // .add_systems(Update, tick_star_spawn_timer)
         .add_systems(Update, spawn_enemies_over_time)
         .add_systems(Update, spawn_stars_over_time)
-        .add_systems(Update, bevy::window::close_on_esc) 
+        .add_systems(Update, bevy::window::close_on_esc)
         // or...
         // .add_systems(Update, exit_game)
         .add_systems(Update, handle_game_over)
@@ -49,11 +49,20 @@ fn main() {
 }
 
 #[derive(Component)]
-struct Player {}
+struct Player {
+    size: f32,
+}
+
+impl Default for Player {
+    fn default() -> Self {
+        Self { size: PLAYER_SIZE }
+    }
+}
 
 #[derive(Component)]
 struct Enemy {
     direction: Vec2,
+    size: f32,
 }
 
 impl Default for Enemy {
@@ -64,6 +73,7 @@ impl Default for Enemy {
                 rand::thread_rng().gen_range(-1.0..1.0),
             )
             .normalize(),
+            size: ENEMY_SIZE,
         }
     }
 }
@@ -129,7 +139,7 @@ fn spawn_player(
             texture: asset_server.load("sprites/ball_blue_large.png"),
             ..default()
         },
-        Player {},
+        Player::default(),
     ));
 }
 
@@ -266,13 +276,14 @@ fn update_enemy_direction(
     asset_server: Res<AssetServer>,
 ) {
     let window = window_query.get_single().unwrap();
-    let half_enemy_size = ENEMY_SIZE / 2.0;
-    let x_min = 0.0 + half_enemy_size;
-    let x_max = window.width() - half_enemy_size;
-    let y_min = 0.0 + half_enemy_size;
-    let y_max = window.height() - half_enemy_size;
 
     for (enemy_transform, mut enemy) in enemy_query.iter_mut() {
+        let half_enemy_size = enemy.size / 2.0;
+        let x_min = 0.0 + half_enemy_size;
+        let x_max = window.width() - half_enemy_size;
+        let y_min = 0.0 + half_enemy_size;
+        let y_max = window.height() - half_enemy_size;
+
         let mut direction_changed = false;
         let translation = enemy_transform.translation;
         // If out of bounds in any dimension, flip the direction in that dimension
@@ -335,20 +346,30 @@ fn confine_enemy_movement(
     }
 }
 
-// Works with all the sprites, but at the moment assumes them to be all the size of the ENEMY_SIZE
 fn confine_sprite_movement(
-    mut sprite_query: Query<&mut Transform>,
+    mut sprite_query: Query<(&mut Transform, AnyOf<(&Enemy, &Player)>)>,
     window_query: Query<&mut Window, With<PrimaryWindow>>,
 ) {
+    // Slightly more generic confine, in that it works for both Enemy and Player, using the sizes
+    // stored in the component. That makes it a bit more flexible if a third component comes along with
+    // a different size.
     let window = window_query.get_single().unwrap();
 
-    let half_sprite_size = ENEMY_SIZE / 2.0;
-    let x_min = 0.0 + half_sprite_size;
-    let x_max = window.width() - half_sprite_size;
-    let y_min = 0.0 + half_sprite_size;
-    let y_max = window.height() - half_sprite_size;
+    for (mut sprite_transform, (enemy, player)) in sprite_query.iter_mut() {
+        let mut half_sprite_size = 0.0;
+        // It'll be one or the other...
+        if let Some(sprite) = enemy {
+            half_sprite_size = sprite.size / 2.0;
+        }
+        if let Some(sprite) = player {
+            half_sprite_size = sprite.size / 2.0;
+        }
 
-    for mut sprite_transform in sprite_query.iter_mut() {
+        let x_min = 0.0 + half_sprite_size;
+        let x_max = window.width() - half_sprite_size;
+        let y_min = 0.0 + half_sprite_size;
+        let y_max = window.height() - half_sprite_size;
+
         let mut translation = sprite_transform.translation;
         if translation.x < x_min {
             translation.x = x_min;
@@ -420,10 +441,8 @@ fn player_catch_star(
             if distance < player_radius + star_radius {
                 println!("Player hit star!");
                 score.value += 1;
-                // let sound_effect = asset_server.load("audio/laserLarge_000.ogg");
                 commands.spawn(AudioBundle {
                     source: asset_server.load("audio/laserLarge_000.ogg"),
-                    // source: sound_effect,
                     settings: PlaybackSettings::DESPAWN,
                     ..default()
                 });
@@ -440,12 +459,6 @@ fn update_score(score: Res<Score>) {
     }
 }
 
-#[allow(unused)]
-fn tick_star_spawn_timer(mut star_spawn_timer: ResMut<StarSpawnTimer>, time: Res<Time>) {
-    star_spawn_timer.timer.tick(time.delta());
-}
-
-// Combined the tick system into this system...
 fn spawn_stars_over_time(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -453,8 +466,6 @@ fn spawn_stars_over_time(
     mut star_spawn_timer: ResMut<StarSpawnTimer>,
     time: Res<Time>,
 ) {
-    // star_spawn_timer.timer.tick(time.delta());
-    // if star_spawn_timer.timer.finished() {
     if star_spawn_timer.timer.tick(time.delta()).finished() {
         let window = window_query.get_single().unwrap();
         let random_x = random::<f32>() * window.width();
