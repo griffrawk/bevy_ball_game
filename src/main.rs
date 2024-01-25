@@ -264,7 +264,6 @@ fn enemy_movement(mut enemy_query: Query<(&mut Transform, &Enemy)>, time: Res<Ti
     for (mut transform, enemy) in enemy_query.iter_mut() {
         let direction = Vec3::new(enemy.direction.x, enemy.direction.y, 0.0);
         transform.translation += direction * ENEMY_SPEED * time.delta_seconds();
-        let _ = random::<f32>();
     }
 }
 
@@ -401,6 +400,7 @@ fn enemy_hit_player(
                 .translation
                 .distance(enemy_transform.translation);
             // Hopefully these are inlined by the compiler...
+            // but might change to get the sizes from the components
             let player_radius = PLAYER_SIZE / 2.0;
             let enemy_radius = ENEMY_SIZE / 2.0;
             if distance < player_radius + enemy_radius {
