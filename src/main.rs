@@ -354,15 +354,16 @@ fn confine_sprite_movement(
     // a different size.
     let window = window_query.get_single().unwrap();
 
-    for (mut sprite_transform, (enemy, player)) in sprite_query.iter_mut() {
-        let mut half_sprite_size = 0.0;
-        // It'll be one or the other...
-        if let Some(sprite) = enemy {
-            half_sprite_size = sprite.size / 2.0;
-        }
-        if let Some(sprite) = player {
-            half_sprite_size = sprite.size / 2.0;
-        }
+    for (mut sprite_transform, target) in sprite_query.iter_mut() {
+        let half_sprite_size = match target {
+            (Some(sprite), None) => {
+                sprite.size / 2.0
+            }
+            (None, Some(sprite)) => {
+                sprite.size / 2.0
+            }
+            _ => unreachable!("entities should never have Enemy and Player at the same time")
+        };
 
         let x_min = 0.0 + half_sprite_size;
         let x_max = window.width() - half_sprite_size;
@@ -387,7 +388,7 @@ fn confine_sprite_movement(
 fn enemy_hit_player(
     mut commands: Commands,
     mut game_over_event_writer: EventWriter<GameOver>,
-    // Entity is just a u32 so it can be copied, not borrowed.
+    // Entity is just a u32, so it can be copied, not borrowed.
     player_query: Query<(Entity, &Transform), With<Player>>,
     enemy_query: Query<&Transform, With<Enemy>>,
     asset_server: Res<AssetServer>,
