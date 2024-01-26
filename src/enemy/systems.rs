@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use rand::prelude::*;
+use rand::random;
 
 use super::components::Enemy;
 use super::resources::EnemySpawnTimer;

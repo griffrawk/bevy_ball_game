@@ -4,7 +4,7 @@ mod systems;
 
 use bevy::prelude::*;
 
-use resources::*;
+use resources::StarSpawnTimer;
 use systems::*;
 
 pub struct StarPlugin;
