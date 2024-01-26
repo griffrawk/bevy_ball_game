@@ -2,11 +2,12 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use rand::prelude::*;
 
+use super::components::Enemy;
+use super::resources::EnemySpawnTimer;
 use crate::constants::*;
-use crate::enemy::{components::*, resources::*};
-use crate::player::components::*;
-use crate::score::resources::*;
-use crate::events::*;
+use crate::events::GameOver;
+use crate::player::components::Player;
+use crate::score::resources::Score;
 
 #[allow(unused)]
 pub fn spawn_enemies(

@@ -8,40 +8,22 @@ mod systems;
 
 use bevy::prelude::*;
 
-use crate::events::*;
-use crate::enemy::{resources::*, systems::*};
-use crate::player::systems::*;
-use crate::score::{resources::*, systems::*};
-use crate::star::{resources::*, systems::*};
-use crate::systems::*;
+use enemy::EnemyPlugin;
+use events::*;
+use player::PlayerPlugin;
+use score::ScorePlugin;
+use star::StarPlugin;
+use systems::*;
 
 fn main() {
-    // All the systems are added very verbosely, but they can be grouped, and can be conditional as well.
-    // It's happened like this because of the evolvment of the videos they are taken from.
-    // Coming soon (ep7), the big refactor.
     App::new()
         .add_plugins(DefaultPlugins)
-        .init_resource::<Score>()
-        .init_resource::<StarSpawnTimer>()
-        .init_resource::<EnemySpawnTimer>()
         .add_event::<GameOver>()
+        .add_plugins(EnemyPlugin {})
+        .add_plugins(PlayerPlugin {})
+        .add_plugins(ScorePlugin {})
+        .add_plugins(StarPlugin {})
         .add_systems(Startup, spawn_camera)
-        .add_systems(Startup, spawn_player)
-        .add_systems(Startup, spawn_enemies)
-        .add_systems(Startup, spawn_stars)
-        .add_systems(Update, player_movement)
-        .add_systems(Update, enemy_movement)
-        // .add_systems(Update, confine_sprite_movement)
-        .add_systems(Update, confine_player_movement)
-        .add_systems(Update, confine_enemy_movement)
-        .add_systems(Update, update_enemy_direction)
-        .add_systems(Update, enemy_hit_player)
-        .add_systems(Update, player_catch_star)
-        .add_systems(Update, update_score)
-        .add_systems(Update, spawn_enemies_over_time)
-        .add_systems(Update, spawn_stars_over_time)
-        // .add_systems(Update, bevy::window::close_on_esc)
-        // or...
         .add_systems(Update, exit_game)
         .add_systems(Update, handle_game_over)
         .run();

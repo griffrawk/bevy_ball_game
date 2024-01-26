@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
+use super::components::Player;
 use crate::constants::*;
-use crate::player::components::*;
-use crate::score::resources::*;
-use crate::star::components::*;
+use crate::score::resources::Score;
+use crate::star::components::Star;
 
 pub fn spawn_player(
     mut commands: Commands,

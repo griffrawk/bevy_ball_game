@@ -2,8 +2,9 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use rand::prelude::*;
 
+use super::components::Star;
+use super::resources::StarSpawnTimer;
 use crate::constants::*;
-use crate::star::{components::*, resources::*};
 
 #[allow(unused)]
 pub fn spawn_stars(
