@@ -1,15 +1,19 @@
-// bevy_ball_game - Jacques
-pub mod systems;
-pub mod components;
-pub mod events;
-pub mod resources;
-pub mod constants;
+mod constants;
+mod enemy;
+mod events;
+mod player;
+mod score;
+mod star;
+mod systems;
 
 use bevy::prelude::*;
 
-use crate::systems::*;
 use crate::events::*;
-use crate::resources::*;
+use crate::enemy::{resources::*, systems::*};
+use crate::player::systems::*;
+use crate::score::{resources::*, systems::*};
+use crate::star::{resources::*, systems::*};
+use crate::systems::*;
 
 fn main() {
     // All the systems are added very verbosely, but they can be grouped, and can be conditional as well.
@@ -27,19 +31,18 @@ fn main() {
         .add_systems(Startup, spawn_stars)
         .add_systems(Update, player_movement)
         .add_systems(Update, enemy_movement)
-        .add_systems(Update, confine_sprite_movement)
-        // .add_systems(Update, confine_player_movement)
-        // .add_systems(Update, confine_enemy_movement)
+        // .add_systems(Update, confine_sprite_movement)
+        .add_systems(Update, confine_player_movement)
+        .add_systems(Update, confine_enemy_movement)
         .add_systems(Update, update_enemy_direction)
         .add_systems(Update, enemy_hit_player)
         .add_systems(Update, player_catch_star)
         .add_systems(Update, update_score)
-        // .add_systems(Update, tick_star_spawn_timer)
         .add_systems(Update, spawn_enemies_over_time)
         .add_systems(Update, spawn_stars_over_time)
-        .add_systems(Update, bevy::window::close_on_esc)
+        // .add_systems(Update, bevy::window::close_on_esc)
         // or...
-        // .add_systems(Update, exit_game)
+        .add_systems(Update, exit_game)
         .add_systems(Update, handle_game_over)
         .run();
 }
