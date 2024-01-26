@@ -1,4 +1,5 @@
-#[allow(unused)]
+use bevy::prelude::*;
+
 pub fn confine_sprite_movement(
     mut sprite_query: Query<(&mut Transform, AnyOf<(&Enemy, &Player)>)>,
     window_query: Query<&mut Window, With<PrimaryWindow>>,
