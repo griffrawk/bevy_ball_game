@@ -6,7 +6,7 @@ use bevy::prelude::*;
 use resources::Score;
 use systems::update_score;
 
-pub struct ScorePlugin {}
+pub struct ScorePlugin;
 
 impl Plugin for ScorePlugin {
     fn build(&self, app: &mut App) {

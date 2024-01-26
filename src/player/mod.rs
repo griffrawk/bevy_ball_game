@@ -5,7 +5,7 @@ use bevy::prelude::*;
 
 use systems::*;
 
-pub struct PlayerPlugin {}
+pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {

@@ -7,7 +7,7 @@ use bevy::prelude::*;
 use resources::*;
 use systems::*;
 
-pub struct StarPlugin {}
+pub struct StarPlugin;
 
 impl Plugin for StarPlugin {
     fn build(&self, app: &mut App) {

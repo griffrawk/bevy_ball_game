@@ -7,7 +7,8 @@ use bevy::prelude::*;
 use resources::EnemySpawnTimer;
 use systems::*;
 
-pub struct EnemyPlugin {}
+
+pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {

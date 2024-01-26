@@ -9,7 +9,6 @@ use crate::events::GameOver;
 use crate::player::components::Player;
 use crate::score::resources::Score;
 
-#[allow(unused)]
 pub fn spawn_enemies(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,

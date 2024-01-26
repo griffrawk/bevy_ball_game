@@ -6,7 +6,6 @@ use super::components::Star;
 use super::resources::StarSpawnTimer;
 use crate::constants::*;
 
-#[allow(unused)]
 pub fn spawn_stars(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
