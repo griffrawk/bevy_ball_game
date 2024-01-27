@@ -6,8 +6,8 @@ use super::components::Enemy;
 use super::resources::EnemySpawnTimer;
 use crate::constants::*;
 use crate::events::GameOver;
-use crate::player::components::Player;
-use crate::score::resources::Score;
+use crate::game::player::components::Player;
+use crate::game::score::resources::Score;
 
 pub fn spawn_enemies(
     mut commands: Commands,

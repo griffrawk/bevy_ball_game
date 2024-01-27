@@ -3,8 +3,8 @@ use bevy::window::PrimaryWindow;
 
 use super::components::Player;
 use crate::constants::*;
-use crate::score::resources::Score;
-use crate::star::components::Star;
+use crate::game::score::resources::Score;
+use crate::game::star::components::Star;
 
 pub fn spawn_player(
     mut commands: Commands,
