@@ -23,12 +23,12 @@ impl Plugin for EnemyPlugin {
                     confine_enemy_movement,
                     update_enemy_direction,
                     spawn_enemies_over_time,
+                    enemy_hit_player,
                 )
                     .chain()
                     .run_if(in_state(AppState::Game))
                     .run_if(in_state(SimulationState::Running)),
             )
-            .add_systems(Update, enemy_hit_player)
             // exit state systems
             .add_systems(OnExit(AppState::Game), despawn_enemies);
     }
