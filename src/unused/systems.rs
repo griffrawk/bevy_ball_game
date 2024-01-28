@@ -10,6 +10,7 @@ pub fn confine_sprite_movement(
     let window = window_query.get_single().unwrap();
 
     for (mut sprite_transform, target) in sprite_query.iter_mut() {
+        // A better way of handling a tuple of Options
         let half_sprite_size = match target {
             (Some(sprite), None) => {
                 sprite.size / 2.0

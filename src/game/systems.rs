@@ -6,7 +6,7 @@ pub fn toggle_simulation(
     mut commands: Commands,
     keyboard_input: Res<Input<KeyCode>>,
     simulation_state: Res<State<SimulationState>>,
-){
+) {
     if keyboard_input.just_pressed(KeyCode::Space) {
         // 0.11 changed to a getter which is derefed
         if *simulation_state.get() == SimulationState::Running {
@@ -18,4 +18,4 @@ pub fn toggle_simulation(
             println!("Running");
         }
     }
-}   
+}

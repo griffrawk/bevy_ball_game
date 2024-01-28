@@ -4,7 +4,7 @@ pub struct MainMenuPlugin;
 
 impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, main_menu);       
+        app.add_systems(Startup, main_menu);
     }
 }
 

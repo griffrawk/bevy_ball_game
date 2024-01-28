@@ -32,6 +32,12 @@ pub fn spawn_enemies(
     }
 }
 
+pub fn despawn_enemies(mut commands: Commands, enemy_query: Query<Entity, With<Enemy>>) {
+    for enemy_entity in enemy_query.iter() {
+        commands.entity(enemy_entity).despawn();
+    }
+}
+
 pub fn enemy_movement(mut enemy_query: Query<(&mut Transform, &Enemy)>, time: Res<Time>) {
     for (mut transform, enemy) in enemy_query.iter_mut() {
         let direction = Vec3::new(enemy.direction.x, enemy.direction.y, 0.0);
@@ -39,6 +45,7 @@ pub fn enemy_movement(mut enemy_query: Query<(&mut Transform, &Enemy)>, time: Re
     }
 }
 
+#[allow(unused)]
 pub fn update_enemy_direction(
     mut commands: Commands, // needed for the sfx since 0.1?
     mut enemy_query: Query<(&Transform, &mut Enemy)>, // tuple
@@ -69,20 +76,21 @@ pub fn update_enemy_direction(
         }
 
         // play sfx
-        if direction_changed {
-            // pick a random pluck
-            let sound_effect = if random::<f32>() > 0.5 {
-                asset_server.load("audio/pluck_001.ogg")
-            } else {
-                asset_server.load("audio/pluck_002.ogg")
-            };
-            // audio.play(sound_effect);        // old doesn't work
-            commands.spawn(AudioBundle {
-                source: sound_effect,
-                settings: PlaybackSettings::DESPAWN,
-                ..default()
-            });
-        }
+        // if direction_changed {
+        //     // pick a random pluck
+        //     let sound_effect = if random::<f32>() > 0.5 {
+        //         asset_server.load("audio/pluck_001.ogg")
+        //     } else {
+        //         asset_server.load("audio/pluck_002.ogg")
+        //     };
+        //     audio.play(sound_effect);        // old doesn't work
+        //     Commented out. Getting very old, very quick...
+        //     commands.spawn(AudioBundle {
+        //         source: sound_effect,
+        //         settings: PlaybackSettings::DESPAWN,
+        //         ..default()
+        //     });
+        // }
     }
 }
 
@@ -165,7 +173,6 @@ pub fn enemy_hit_player(
                     source: asset_server.load("audio/explosionCrunch_000.ogg"),
                     // source: sound_effect,
                     settings: PlaybackSettings::DESPAWN,
-                    ..default()
                 });
                 // Player 1 Go Boom...
                 commands.entity(player_entity).despawn();
