@@ -50,7 +50,6 @@ pub fn update_enemy_direction(
     mut commands: Commands, // needed for the sfx since 0.1?
     mut enemy_query: Query<(&Transform, &mut Enemy)>, // tuple
     window_query: Query<&Window, With<PrimaryWindow>>, // filtered
-    // audio: Res<Audio>,         // old doesn't work
     asset_server: Res<AssetServer>,
 ) {
     let window = window_query.get_single().unwrap();
@@ -83,7 +82,6 @@ pub fn update_enemy_direction(
         //     } else {
         //         asset_server.load("audio/pluck_002.ogg")
         //     };
-        //     audio.play(sound_effect);        // old doesn't work
         //     Commented out. Getting very old, very quick...
         //     commands.spawn(AudioBundle {
         //         source: sound_effect,
