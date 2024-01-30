@@ -4,7 +4,7 @@ use rand::random;
 
 use super::components::Star;
 use super::resources::StarSpawnTimer;
-use crate::constants::*;
+use crate::game::constants::*;
 
 pub fn spawn_stars(
     mut commands: Commands,

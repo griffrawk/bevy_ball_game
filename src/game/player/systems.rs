@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 use super::components::Player;
-use crate::constants::*;
+use crate::game::constants::*;
 use crate::game::score::resources::Score;
 use crate::game::star::components::Star;
 

@@ -1,4 +1,3 @@
-mod constants;
 mod events;
 mod game;
 mod main_menu;

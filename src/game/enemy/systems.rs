@@ -4,7 +4,7 @@ use rand::random;
 
 use super::components::Enemy;
 use super::resources::EnemySpawnTimer;
-use crate::constants::*;
+use crate::game::constants::*;
 use crate::events::GameOver;
 use crate::game::player::components::Player;
 use crate::game::score::resources::Score;

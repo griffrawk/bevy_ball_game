@@ -4,17 +4,15 @@ use crate::main_menu::components::*;
 use crate::main_menu::styles::*;
 
 pub fn spawn_main_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
-    // But what do I do with it? Nothing it seems! Its already spawned the NodeBundle
     // let main_menu_entity = build_main_menu(&mut commands, &asset_server);
 
-    // However, rather than use a return, it will work if the build_main_menu just sends
+    // However, rather than use a return, it will work if build_main_menu() just sends
     // the commands rather than returning an entity...
     build_main_menu(&mut commands, &asset_server);
 }
 
 pub fn despawn_main_menu(mut commands: Commands, main_menu_query: Query<Entity, With<MainMenu>>) {
     if let Ok(main_menu_entity) = main_menu_query.get_single() {
-        // As the main menu entity has children, then despawn_recursive()
         commands.entity(main_menu_entity).despawn_recursive();
     }
 }
@@ -42,6 +40,7 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
             MainMenu {},
         ))
         .with_children(|parent| {
+        
             // Title
             parent
                 .spawn(NodeBundle {
@@ -49,6 +48,7 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                     ..default()
                 })
                 .with_children(|parent| {
+        
                     // Title Image 1
                     parent.spawn(ImageBundle {
                         style: IMAGE_STYLE,
@@ -88,6 +88,7 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                     PlayButton {},
                 ))
                 .with_children(|parent| {
+                
                     // Play button Text
                     // Jeez! Can see why people want a UI editor!
                     parent.spawn(TextBundle {
@@ -114,6 +115,8 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                     QuitButton {},
                 ))
                 .with_children(|parent| {
+                 
+                    // Quit button text
                     parent.spawn(TextBundle {
                         text: Text {
                             sections: vec![TextSection::new(

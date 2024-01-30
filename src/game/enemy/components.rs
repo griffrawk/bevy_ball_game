@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use rand::prelude::*;
 
-use crate::constants::*;
+use crate::game::constants::*;
 
 #[derive(Component)]
 pub struct Enemy {
