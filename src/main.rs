@@ -4,6 +4,7 @@ mod main_menu;
 mod systems;
 
 use bevy::prelude::*;
+use bevy_screen_diagnostics::{ScreenDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin};
 
 use game::GamePlugin;
 use main_menu::MainMenuPlugin;
@@ -13,6 +14,8 @@ fn main() {
     App::new()
         // Bevy plugins
         .add_plugins(DefaultPlugins)
+        .add_plugins(ScreenDiagnosticsPlugin::default())
+        .add_plugins(ScreenFrameDiagnosticsPlugin)
         .add_state::<AppState>()
         // My plugins
         .add_plugins(MainMenuPlugin)

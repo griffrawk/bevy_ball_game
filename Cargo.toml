@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.12.1"
+bevy_screen_diagnostics = "0.4.0"
 rand = "0.8.5"
