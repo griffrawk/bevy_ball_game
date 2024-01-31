@@ -6,13 +6,13 @@ use super::resources::AnimationTimer;
 use crate::game::constants::*;
 use crate::game::score::resources::Score;
 use crate::game::star::components::Star;
-use crate::MyAssets;
+use crate::PlayerAssets;
 
 pub fn spawn_player(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     // asset_server: Res<AssetServer>,
-    player_assets: Res<MyAssets>,
+    player_assets: Res<PlayerAssets>,
 ) {
     let window = window_query.get_single().unwrap();
     // commands.spawn((
