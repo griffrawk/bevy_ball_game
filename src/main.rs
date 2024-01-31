@@ -4,6 +4,7 @@ mod main_menu;
 mod systems;
 
 use bevy::prelude::*;
+use bevy_asset_loader::prelude::*;
 use bevy_screen_diagnostics::{ScreenDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin};
 
 use game::GamePlugin;
@@ -18,6 +19,11 @@ fn main() {
         .add_plugins(ScreenFrameDiagnosticsPlugin)
         .add_state::<AppState>()
         // My plugins
+        .add_loading_state(
+            LoadingState::new(AppState::AssetLoading)
+                .continue_to_state(AppState::MainMenu)
+                .load_collection::<MyAssets>(),
+        )
         .add_plugins(MainMenuPlugin)
         .add_plugins(GamePlugin)
         // Startup
@@ -33,7 +39,21 @@ fn main() {
 #[derive(States, Debug, Clone, Copy, Eq, Hash, PartialEq, Default)]
 pub enum AppState {
     #[default]
+    AssetLoading,
     MainMenu,
     Game,
     GameOver,
+}
+
+
+// todo move this somewhere more player oriented... game/player/components.rs maybe
+#[derive(AssetCollection, Resource)]
+struct MyAssets {
+    // if the sheet would have padding, you could set that with `padding_x` and `padding_y`.
+    // if there would be space between the top left corner of the sheet and the first sprite, you could configure that with `offset_x` and `offset_y`
+    #[asset(texture_atlas(tile_size_x = 96., tile_size_y = 99., columns = 8, rows = 1))]
+    // you can configure the sampler for the sprite sheet image
+    #[asset(image(sampler = nearest))]
+    #[asset(path = "sprites/female_adventurer_sheet.png")]
+    female_adventurer: Handle<TextureAtlas>,
 }

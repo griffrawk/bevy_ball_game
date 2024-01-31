@@ -12,3 +12,4 @@ impl Default for Player {
         Self { size: PLAYER_SIZE }
     }
 }
+

@@ -1,9 +1,9 @@
+mod constants;
 pub mod enemy;
 pub mod player;
 pub mod score;
 pub mod star;
 mod systems;
-mod constants;
 
 use bevy::prelude::*;
 

@@ -2,21 +2,34 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 use super::components::Player;
+use super::resources::AnimationTimer;
 use crate::game::constants::*;
 use crate::game::score::resources::Score;
 use crate::game::star::components::Star;
+use crate::MyAssets;
 
 pub fn spawn_player(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    asset_server: Res<AssetServer>,
+    // asset_server: Res<AssetServer>,
+    my_assets: Res<MyAssets>,
 ) {
     let window = window_query.get_single().unwrap();
+    // commands.spawn((
+    //     SpriteBundle {
+    //         // middle of window
+    //         transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
+    //         texture: asset_server.load("sprites/ball_blue_large.png"),
+    //         ..default()
+    //     },
+    //     Player::default(),
+    // ));
+
     commands.spawn((
-        SpriteBundle {
-            // middle of window
+        SpriteSheetBundle {
             transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
-            texture: asset_server.load("sprites/ball_blue_large.png"),
+            sprite: TextureAtlasSprite::new(0),
+            texture_atlas: my_assets.female_adventurer.clone(),
             ..default()
         },
         Player::default(),
@@ -115,6 +128,18 @@ pub fn player_catch_star(
                 // Catch a falling star
                 commands.entity(star_entity).despawn();
             }
+        }
+    }
+}
+
+pub fn animate_player_sprite(
+    time: Res<Time>,
+    mut animation_timer: ResMut<AnimationTimer>,
+    mut sprites_to_animate: Query<&mut TextureAtlasSprite>,
+) {
+    if animation_timer.timer.tick(time.delta()).finished() {
+        for mut sprite in &mut sprites_to_animate {
+            sprite.index = (sprite.index + 1) % 8;
         }
     }
 }
