@@ -18,12 +18,13 @@ fn main() {
         .add_plugins(ScreenDiagnosticsPlugin::default())
         .add_plugins(ScreenFrameDiagnosticsPlugin)
         .add_state::<AppState>()
-        // My plugins
+        // Load asset texture atlas
         .add_loading_state(
             LoadingState::new(AppState::AssetLoading)
-                .continue_to_state(AppState::MainMenu)
-                .load_collection::<MyAssets>(),
+            .continue_to_state(AppState::MainMenu)
+            .load_collection::<MyAssets>(),
         )
+        // My plugins
         .add_plugins(MainMenuPlugin)
         .add_plugins(GamePlugin)
         // Startup
@@ -46,7 +47,7 @@ pub enum AppState {
 }
 
 
-// todo move this somewhere more player oriented... game/player/components.rs maybe
+// todo move this somewhere more player oriented... game/player/resources.rs maybe
 #[derive(AssetCollection, Resource)]
 struct MyAssets {
     // if the sheet would have padding, you could set that with `padding_x` and `padding_y`.

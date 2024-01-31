@@ -12,7 +12,7 @@ pub fn spawn_player(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     // asset_server: Res<AssetServer>,
-    my_assets: Res<MyAssets>,
+    player_assets: Res<MyAssets>,
 ) {
     let window = window_query.get_single().unwrap();
     // commands.spawn((
@@ -29,7 +29,7 @@ pub fn spawn_player(
         SpriteSheetBundle {
             transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
             sprite: TextureAtlasSprite::new(0),
-            texture_atlas: my_assets.female_adventurer.clone(),
+            texture_atlas: player_assets.female_adventurer.clone(),
             ..default()
         },
         Player::default(),
