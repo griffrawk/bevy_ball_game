@@ -3,10 +3,11 @@ use bevy::window::PrimaryWindow;
 
 use super::components::Player;
 use super::resources::AnimationTimer;
+use super::PlayerState;
 use crate::game::constants::*;
 use crate::game::score::resources::Score;
 use crate::game::star::components::Star;
-use crate::PlayerAssets;
+use crate::game::player::components::PlayerAssets;
 
 pub fn spawn_player(
     mut commands: Commands,
@@ -45,6 +46,8 @@ pub fn despawn_player(mut commands: Commands, player_query: Query<Entity, With<P
 pub fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
     mut player_query: Query<&mut Transform, With<Player>>,
+    player_state: Res<State<PlayerState>>,
+    mut next_player_state: ResMut<NextState<PlayerState>>,
     time: Res<Time>,
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
@@ -63,8 +66,14 @@ pub fn player_movement(
             direction += Vec3::new(0.0, -1.0, 0.0)
         }
 
+        // Are we moving?
         if direction.length() > 0.0 {
             direction = direction.normalize();
+            if *player_state.get() == PlayerState::Paused {
+                next_player_state.set(PlayerState::Walking);
+            }
+        } else if *player_state.get() == PlayerState::Walking {
+            next_player_state.set(PlayerState::Paused);
         }
 
         player_transform.translation += direction * PLAYER_SPEED * time.delta_seconds();

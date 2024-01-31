@@ -20,12 +20,10 @@ pub fn toggle_simulation(
         // 0.11 changed to a getter (which is derefed) / setter
         if *simulation_state.get() == SimulationState::Running {
             next_sim_state.set(SimulationState::Paused);
-            // commands.insert_resource(NextState(Some(SimulationState::Paused)));
             println!("Paused");
         }
         if *simulation_state.get() == SimulationState::Paused {
             next_sim_state.set(SimulationState::Running);
-            // commands.insert_resource(NextState(Some(SimulationState::Running)));
             println!("Running");
         }
     }
