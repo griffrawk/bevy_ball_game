@@ -128,8 +128,8 @@ pub fn player_catch_star(
             let player_radius = PLAYER_SIZE / 2.0;
             let star_radius = STAR_SIZE / 2.0;
             if distance < player_radius + star_radius {
-                println!("Player hit star!");
                 score.value += 1;
+                // Pow!
                 commands.spawn(AudioBundle {
                     source: asset_server.load("audio/laserLarge_000.ogg"),
                     settings: PlaybackSettings::DESPAWN,
