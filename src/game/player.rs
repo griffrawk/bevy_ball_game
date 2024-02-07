@@ -9,6 +9,13 @@ use crate::AppState;
 use resources::AnimationTimer;
 use systems::*;
 
+#[derive(States, Debug, Clone, Copy, Eq, Hash, PartialEq, Default)]
+pub enum PlayerState {
+    #[default]
+    Paused,
+    Walking,
+}
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -32,9 +39,3 @@ impl Plugin for PlayerPlugin {
     }
 }
 
-#[derive(States, Debug, Clone, Copy, Eq, Hash, PartialEq, Default)]
-pub enum PlayerState {
-    #[default]
-    Paused,
-    Walking,
-}

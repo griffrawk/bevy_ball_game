@@ -14,6 +14,13 @@ use score::ScorePlugin;
 use star::StarPlugin;
 use systems::*;
 
+#[derive(States, Clone, Copy, Eq, Hash, PartialEq, Default, Debug)]
+pub enum SimulationState {
+    #[default]
+    Running,
+    Paused,
+}
+
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
@@ -27,9 +34,3 @@ impl Plugin for GamePlugin {
     }
 }
 
-#[derive(States, Clone, Copy, Eq, Hash, PartialEq, Default, Debug)]
-pub enum SimulationState {
-    #[default]
-    Running,
-    Paused,
-}
