@@ -8,7 +8,6 @@ use bevy_asset_loader::prelude::*;
 use bevy_screen_diagnostics::{ScreenDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin};
 
 use game::player::components::PlayerAssets;
-use game::enemy::components::Enemy;
 use game::GamePlugin;
 use main_menu::MainMenuPlugin;
 use systems::*;
