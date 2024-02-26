@@ -5,15 +5,16 @@ use super::components::Player;
 use super::resources::AnimationTimer;
 use super::PlayerState;
 use crate::game::constants::*;
+use crate::game::player::components::PlayerAssets;
 use crate::game::score::resources::Score;
 use crate::game::star::components::Star;
-use crate::game::player::components::PlayerAssets;
 
 pub fn spawn_player(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     // asset_server: Res<AssetServer>,
     player_assets: Res<PlayerAssets>,
+    // mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     let window = window_query.get_single().unwrap();
     // commands.spawn((
@@ -26,6 +27,7 @@ pub fn spawn_player(
     //     Player::default(),
     // ));
 
+    // Using bevy_asset_loader
     commands.spawn((
         SpriteBundle {
             transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
@@ -35,6 +37,28 @@ pub fn spawn_player(
         TextureAtlas::from(player_assets.female_adventurer_layout.clone()),
         Player::default(),
     ));
+
+    // // The bevy native way
+    // let texture: Handle<Image> = asset_server.load("sprites/female_adventurer_sheet.png");
+    // // Describe the spritesheet
+    // let layout = TextureAtlasLayout::from_grid(Vec2::new(96.0, 96.0), 8, 1, None, None);
+    // let texture_atlas_layout = texture_atlas_layouts.add(layout);
+
+    // commands.spawn((
+    //     SpriteSheetBundle {
+    //         texture,
+    //         atlas: TextureAtlas {
+    //             layout: texture_atlas_layout,
+    //             index: 0,
+    //         },
+    //         transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
+    //         ..default()
+    //     },
+    //     Player::default(),
+    // ));
+
+
+
 }
 
 pub fn despawn_player(mut commands: Commands, player_query: Query<Entity, With<Player>>) {
