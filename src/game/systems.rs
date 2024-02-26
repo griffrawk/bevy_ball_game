@@ -12,7 +12,7 @@ pub fn resume_simulation(mut simulation_state_next_state: ResMut<NextState<Simul
 
 pub fn toggle_simulation(
     // mut commands: Commands,
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     simulation_state: Res<State<SimulationState>>,
     mut next_sim_state: ResMut<NextState<SimulationState>>,
 ) {

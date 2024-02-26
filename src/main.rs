@@ -27,7 +27,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(ScreenDiagnosticsPlugin::default())
         .add_plugins(ScreenFrameDiagnosticsPlugin)
-        .add_state::<AppState>()
+        .init_state::<AppState>()
         // Load asset texture atlas
         .add_loading_state(
             LoadingState::new(AppState::AssetLoading)

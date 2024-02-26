@@ -27,12 +27,12 @@ pub fn spawn_player(
     // ));
 
     commands.spawn((
-        SpriteSheetBundle {
+        SpriteBundle {
             transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
-            sprite: TextureAtlasSprite::new(0),
-            texture_atlas: player_assets.female_adventurer.clone(),
+            texture: player_assets.female_adventurer.clone(),
             ..default()
         },
+        TextureAtlas::from(player_assets.female_adventurer_layout.clone()),
         Player::default(),
     ));
 }
@@ -44,7 +44,7 @@ pub fn despawn_player(mut commands: Commands, player_query: Query<Entity, With<P
 }
 
 pub fn player_movement(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     mut player_query: Query<&mut Transform, With<Player>>,
     player_state: Res<State<PlayerState>>,
     mut next_player_state: ResMut<NextState<PlayerState>>,
@@ -53,16 +53,16 @@ pub fn player_movement(
     if let Ok(mut player_transform) = player_query.get_single_mut() {
         let mut direction = Vec3::ZERO;
 
-        if keyboard_input.pressed(KeyCode::Left) || keyboard_input.pressed(KeyCode::A) {
+        if keyboard_input.pressed(KeyCode::ArrowLeft) || keyboard_input.pressed(KeyCode::KeyA) {
             direction += Vec3::new(-1.0, 0.0, 0.0)
         }
-        if keyboard_input.pressed(KeyCode::Right) || keyboard_input.pressed(KeyCode::D) {
+        if keyboard_input.pressed(KeyCode::ArrowRight) || keyboard_input.pressed(KeyCode::KeyD) {
             direction += Vec3::new(1.0, 0.0, 0.0)
         }
-        if keyboard_input.pressed(KeyCode::Up) || keyboard_input.pressed(KeyCode::W) {
+        if keyboard_input.pressed(KeyCode::ArrowUp) || keyboard_input.pressed(KeyCode::KeyW) {
             direction += Vec3::new(0.0, 1.0, 0.0)
         }
-        if keyboard_input.pressed(KeyCode::Down) || keyboard_input.pressed(KeyCode::S) {
+        if keyboard_input.pressed(KeyCode::ArrowDown) || keyboard_input.pressed(KeyCode::KeyS) {
             direction += Vec3::new(0.0, -1.0, 0.0)
         }
 
@@ -144,7 +144,7 @@ pub fn player_catch_star(
 pub fn animate_player_sprite(
     time: Res<Time>,
     mut animation_timer: ResMut<AnimationTimer>,
-    mut sprites_to_animate: Query<&mut TextureAtlasSprite>,
+    mut sprites_to_animate: Query<&mut TextureAtlas>,
 ) {
     if animation_timer.timer.tick(time.delta()).finished() {
         for mut sprite in &mut sprites_to_animate {
