@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 use super::components::Player;
-use super::resources::AnimationTimer;
+use super::resources::PlayerAnimationTimer;
 use super::PlayerState;
 use crate::game::constants::*;
 use crate::game::player::components::PlayerAssets;
@@ -38,10 +38,12 @@ pub fn spawn_player(
         Player::default(),
     ));
 
-    // // The bevy native way
+    // The bevy native way
+    // handle to the image sheet
     // let texture: Handle<Image> = asset_server.load("sprites/female_adventurer_sheet.png");
-    // // Describe the spritesheet
+    // Describe the spritesheet
     // let layout = TextureAtlasLayout::from_grid(Vec2::new(96.0, 96.0), 8, 1, None, None);
+    // add the layout to the resources
     // let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
     // commands.spawn((
@@ -56,9 +58,6 @@ pub fn spawn_player(
     //     },
     //     Player::default(),
     // ));
-
-
-
 }
 
 pub fn despawn_player(mut commands: Commands, player_query: Query<Entity, With<Player>>) {
@@ -92,6 +91,7 @@ pub fn player_movement(
 
         // Are we moving?
         if direction.length() > 0.0 {
+            println!("player is moving");
             direction = direction.normalize();
             if *player_state.get() == PlayerState::Paused {
                 next_player_state.set(PlayerState::Walking);
@@ -167,10 +167,10 @@ pub fn player_catch_star(
 
 pub fn animate_player_sprite(
     time: Res<Time>,
-    mut animation_timer: ResMut<AnimationTimer>,
-    mut sprites_to_animate: Query<&mut TextureAtlas>,
+    mut player_animation_timer: ResMut<PlayerAnimationTimer>,
+    mut sprites_to_animate: Query<&mut TextureAtlas, With<Player>>,
 ) {
-    if animation_timer.timer.tick(time.delta()).finished() {
+    if player_animation_timer.timer.tick(time.delta()).finished() {
         for mut sprite in &mut sprites_to_animate {
             sprite.index = (sprite.index + 1) % 8;
         }

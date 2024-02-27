@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 
 #[derive(Resource)]
-pub struct AnimationTimer {
+pub struct PlayerAnimationTimer {
     pub timer: Timer,
 }
 
-impl Default for AnimationTimer {
+impl Default for PlayerAnimationTimer {
     fn default() -> Self {
         Self {
             timer: Timer::from_seconds(0.1, TimerMode::Repeating),

@@ -6,7 +6,7 @@ use bevy::prelude::*;
 
 use super::SimulationState;
 use crate::AppState;
-use resources::AnimationTimer;
+use resources::PlayerAnimationTimer;
 use systems::*;
 
 #[derive(States, Debug, Clone, Copy, Eq, Hash, PartialEq, Default)]
@@ -20,7 +20,7 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.init_resource::<AnimationTimer>()
+        app.init_resource::<PlayerAnimationTimer>()
             .init_state::<PlayerState>()
             .add_systems(OnEnter(AppState::Game), spawn_player)
             .add_systems(

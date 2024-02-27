@@ -6,6 +6,7 @@ use bevy::prelude::*;
 
 use crate::AppState;
 use resources::EnemySpawnTimer;
+use resources::EnemyAnimationTimer;
 use systems::*;
 
 use super::SimulationState;
@@ -15,13 +16,15 @@ pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<EnemySpawnTimer>()
+            .init_resource::<EnemyAnimationTimer>()
             .add_systems(OnEnter(AppState::Game), spawn_enemies)
             .add_systems(
                 Update,
                 (
                     enemy_movement,
-                    confine_enemy_movement,
                     update_enemy_direction,
+                    confine_enemy_movement,
+                    animate_enemy_sprite,
                     spawn_enemies_over_time,
                     enemy_hit_player,
                 )

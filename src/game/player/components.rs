@@ -23,3 +23,4 @@ pub struct PlayerAssets {
     #[asset(path = "sprites/female_adventurer_sheet.png")]
     pub female_adventurer: Handle<Image>,
 }
+

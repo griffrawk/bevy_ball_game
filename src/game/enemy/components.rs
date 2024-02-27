@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use rand::prelude::*;
+use bevy_asset_loader::prelude::*;
 
 use crate::game::constants::*;
 
@@ -19,7 +20,16 @@ impl Default for Enemy {
             )
             .normalize(),
             speed: rand::thread_rng().gen_range(ENEMY_LOWER_SPEED..=ENEMY_UPPER_SPEED),
-            size: ENEMY_SIZE,
+            size: ENEMY_HITBOX,
         }
     }
+}
+
+#[derive(AssetCollection, Resource)]
+pub struct EnemyAssets {
+    #[asset(texture_atlas_layout(tile_size_x = 80.0, tile_size_y = 80.0, columns = 8, rows = 1))]
+    pub enemy_layout: Handle<TextureAtlasLayout>,
+    #[asset(image(sampler = nearest))]
+    #[asset(path = "sprites/blob_move.png")]
+    pub enemy: Handle<Image>,
 }

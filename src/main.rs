@@ -8,6 +8,7 @@ use bevy_asset_loader::prelude::*;
 use bevy_screen_diagnostics::{ScreenDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin};
 
 use game::player::components::PlayerAssets;
+use game::enemy::components::EnemyAssets;
 use game::GamePlugin;
 use main_menu::MainMenuPlugin;
 use systems::*;
@@ -32,7 +33,8 @@ fn main() {
         .add_loading_state(
             LoadingState::new(AppState::AssetLoading)
                 .continue_to_state(AppState::MainMenu)
-                .load_collection::<PlayerAssets>(),
+                .load_collection::<PlayerAssets>()
+                .load_collection::<EnemyAssets>()
         )
         // My plugins
         .add_plugins(MainMenuPlugin)
