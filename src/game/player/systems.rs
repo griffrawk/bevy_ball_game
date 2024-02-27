@@ -91,7 +91,6 @@ pub fn player_movement(
 
         // Are we moving?
         if direction.length() > 0.0 {
-            println!("player is moving");
             direction = direction.normalize();
             if *player_state.get() == PlayerState::Paused {
                 next_player_state.set(PlayerState::Walking);
