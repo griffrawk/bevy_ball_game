@@ -17,6 +17,7 @@ pub fn spawn_player(
     // mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     let window = window_query.get_single().unwrap();
+    // The bevy standard, static sprite
     // commands.spawn((
     //     SpriteBundle {
     //         // middle of window

@@ -5,7 +5,9 @@ mod systems;
 
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
-use bevy_screen_diagnostics::{ScreenDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin};
+
+// Onscreen fps
+// use bevy_screen_diagnostics::{ScreenDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin};
 
 use game::player::components::PlayerAssets;
 use game::enemy::components::EnemyAssets;
@@ -26,10 +28,10 @@ fn main() {
     App::new()
         // Bevy plugins
         .add_plugins(DefaultPlugins)
-        .add_plugins(ScreenDiagnosticsPlugin::default())
-        .add_plugins(ScreenFrameDiagnosticsPlugin)
+        // .add_plugins(ScreenDiagnosticsPlugin::default())
+        // .add_plugins(ScreenFrameDiagnosticsPlugin)
         .init_state::<AppState>()
-        // Load asset texture atlas
+        // Load asset texture atlases using bevy_asset_loader
         .add_loading_state(
             LoadingState::new(AppState::AssetLoading)
                 .continue_to_state(AppState::MainMenu)

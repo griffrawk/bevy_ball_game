@@ -3,15 +3,14 @@ use bevy::window::PrimaryWindow;
 use rand::random;
 
 use super::components::Enemy;
-use super::resources::EnemySpawnTimer;
 use super::resources::EnemyAnimationTimer;
-use crate::game::constants::*;
+use super::resources::EnemySpawnTimer;
 use crate::events::GameOver;
+use crate::game::constants::*;
 use crate::game::enemy::components::EnemyAssets;
 
 // For collision detection
 use crate::game::player::components::Player;
-
 use crate::game::score::resources::Score;
 
 pub fn spawn_enemies(
@@ -45,24 +44,16 @@ pub fn spawn_enemies(
             TextureAtlas::from(enemy_assets.enemy_layout.clone()),
             Enemy::default(),
         ));
-    
     }
 }
 
-pub fn despawn_enemies(
-    mut commands: Commands, 
-    enemy_query: Query<Entity, With<Enemy>>
-) {
+pub fn despawn_enemies(mut commands: Commands, enemy_query: Query<Entity, With<Enemy>>) {
     for enemy_entity in enemy_query.iter() {
         commands.entity(enemy_entity).despawn();
     }
 }
 
-pub fn enemy_movement(
-    mut enemy_query: Query<(&mut Transform, &Enemy)>, 
-    time: Res<Time>
-) {
-    
+pub fn enemy_movement(mut enemy_query: Query<(&mut Transform, &Enemy)>, time: Res<Time>) {
     for (mut transform, enemy) in enemy_query.iter_mut() {
         let direction = Vec3::new(enemy.direction.x, enemy.direction.y, 0.0);
         transform.translation += direction * enemy.speed * time.delta_seconds();
@@ -124,7 +115,7 @@ pub fn confine_enemy_movement(
     //  some reason.
     let window = window_query.get_single().unwrap();
 
-    let half_enemy_size = ENEMY_HITBOX / 2.0;
+    let half_enemy_size = ENEMY_SIZE / 2.0;
     let x_min = 0.0 + half_enemy_size;
     let x_max = window.width() - half_enemy_size;
     let y_min = 0.0 + half_enemy_size;
@@ -153,7 +144,6 @@ pub fn spawn_enemies_over_time(
     mut enemy_spawn_timer: ResMut<EnemySpawnTimer>,
     time: Res<Time>,
     enemy_assets: Res<EnemyAssets>,
-
 ) {
     if enemy_spawn_timer.timer.tick(time.delta()).finished() {
         let window = window_query.get_single().unwrap();
@@ -178,7 +168,6 @@ pub fn spawn_enemies_over_time(
             TextureAtlas::from(enemy_assets.enemy_layout.clone()),
             Enemy::default(),
         ));
-
     }
 }
 
@@ -201,7 +190,7 @@ pub fn enemy_hit_player(
             // Hopefully these are inlined by the compiler...
             // but might change to get the sizes from the components
             let player_radius = PLAYER_SIZE / 2.0;
-            let enemy_radius = ENEMY_HITBOX / 2.0;
+            let enemy_radius = ENEMY_SIZE / 2.0;
             if distance < player_radius + enemy_radius {
                 println!("Enemy hit player! Game Over!");
                 // let sound_effect = asset_server.load("audio/explosionCrunch_000.ogg");

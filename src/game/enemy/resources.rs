@@ -15,7 +15,6 @@ impl Default for EnemySpawnTimer {
     }
 }
 
-
 #[derive(Resource)]
 pub struct EnemyAnimationTimer {
     pub timer: Timer,
