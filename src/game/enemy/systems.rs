@@ -21,7 +21,7 @@ pub fn spawn_enemies(
 ) {
     let window = window_query.get_single().unwrap();
     // randomly spread around
-    for _ in 0..NUMBER_OF_ENEMIES {
+    for initial_enemy in 0..NUMBER_OF_ENEMIES {
         let random_x = random::<f32>() * window.width();
         let random_y = random::<f32>() * window.height();
 
@@ -41,7 +41,11 @@ pub fn spawn_enemies(
                 texture: enemy_assets.enemy.clone(),
                 ..default()
             },
-            TextureAtlas::from(enemy_assets.enemy_layout.clone()),
+            TextureAtlas {
+                layout: enemy_assets.enemy_layout.clone(),
+                // use a different starting sprite for each initial enemy
+                index: initial_enemy,
+            },
             Enemy::default(),
         ));
     }
@@ -215,7 +219,7 @@ pub fn animate_enemy_sprite(
 ) {
     if enemy_animation_timer.timer.tick(time.delta()).finished() {
         for (_entity, mut sprite, enemy) in enemy_query.iter_mut() {
-            // println!("{:?} {:?} {:?}", _entity.index(), enemy, sprite.index);
+            println!("{} {:?} {}", _entity.index(), enemy, sprite.index);
             sprite.index = (sprite.index + 1) % 8;
             if enemy.direction.x > 0.0 {
                 sprite.index += 8;
