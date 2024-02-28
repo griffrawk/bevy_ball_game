@@ -211,12 +211,15 @@ pub fn enemy_hit_player(
 pub fn animate_enemy_sprite(
     time: Res<Time>,
     mut enemy_animation_timer: ResMut<EnemyAnimationTimer>,
-    mut sprites_to_animate: Query<&mut TextureAtlas, With<Enemy>>,
+    mut enemy_query: Query<(Entity, &mut TextureAtlas, &Enemy)>,
 ) {
-    // sprites_to_animate is empty, query not working
     if enemy_animation_timer.timer.tick(time.delta()).finished() {
-        for mut sprite in &mut sprites_to_animate {
+        for (_entity, mut sprite, enemy) in enemy_query.iter_mut() {
+            // println!("{:?} {:?} {:?}", _entity.index(), enemy, sprite.index);
             sprite.index = (sprite.index + 1) % 8;
+            if enemy.direction.x > 0.0 {
+                sprite.index += 8;
+            }
         }
     }
 }

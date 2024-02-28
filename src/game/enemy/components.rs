@@ -4,7 +4,7 @@ use bevy_asset_loader::prelude::*;
 
 use crate::game::constants::*;
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct Enemy {
     pub direction: Vec2,
     pub speed: f32,
