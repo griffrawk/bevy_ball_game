@@ -215,17 +215,33 @@ pub fn enemy_hit_player(
 pub fn animate_enemy_sprite(
     time: Res<Time>,
     mut enemy_animation_timer: ResMut<EnemyAnimationTimer>,
-    mut enemy_query: Query<(&mut TextureAtlas, &Enemy)>,
+    mut sprites_to_animate: Query<(&mut TextureAtlas, &Enemy)>,
 ) {
     if enemy_animation_timer.timer.tick(time.delta()).finished() {
-        for (mut sprite, enemy) in enemy_query.iter_mut() {
+        for (mut sprite, enemy) in sprites_to_animate.iter_mut() {
             sprite.index = (sprite.index + 1) % 8;
             // right facing enemy? use right facing sprites
-            // next time round will knock the index down into the 0-7 range, but then 
-            // will be instantly shifted up if still going right.
             if enemy.direction.x > 0.0 {
                 sprite.index += 8;
             }
         }
     }
 }
+
+
+#[test]
+fn sprite_shift() {
+    // sanity check for how the sprite shift works
+    let mut index = 0;
+    
+    for _ in 0..32 {
+        // simulate enemy moving to left
+        index = (index + 1) %8;
+        println!("{}", index);
+        
+        // simulate enemy moving to right
+        index += 8;
+        println!("shifted {}", index);
+    }
+}
+
