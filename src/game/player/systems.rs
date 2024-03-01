@@ -1,5 +1,6 @@
-use bevy::input::gamepad::GamepadButton;
 use bevy::prelude::*;
+
+use bevy::input::gamepad::GamepadButton;
 use bevy::window::PrimaryWindow;
 
 use super::components::Player;
@@ -74,6 +75,8 @@ pub fn player_movement(
     player_state: Res<State<PlayerState>>,
     mut next_player_state: ResMut<NextState<PlayerState>>,
     time: Res<Time>,
+    gamepads: Res<Gamepads>,
+    axes: Res<Axis<GamepadAxis>>,
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
         let mut direction = Vec3::ZERO;
@@ -89,6 +92,32 @@ pub fn player_movement(
         }
         if keyboard_input.pressed(KeyCode::ArrowDown) || keyboard_input.pressed(KeyCode::KeyS) {
             direction += Vec3::new(0.0, -1.0, 0.0)
+        }
+
+        // It works!
+        for gamepad in gamepads.iter() {
+            let left_stick_x = axes
+                .get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickX))
+                .unwrap();
+            let left_stick_y = axes
+                .get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickY))
+                .unwrap();
+            if left_stick_x < -0.1 {
+                // info!("{:?} LeftStickX value is {}", gamepad, left_stick_x);
+                direction += Vec3::new(-1.0, 0.0, 0.0)
+            }
+            if left_stick_x > 0.1 {
+                // info!("{:?} LeftStickX value is {}", gamepad, left_stick_x);
+                direction += Vec3::new(1.0, 0.0, 0.0)
+            }
+            if left_stick_y < -0.1 {
+                // info!("{:?} LeftStickY value is {}", gamepad, left_stick_y);
+                direction += Vec3::new(0.0, -1.0, 0.0)
+            }
+            if left_stick_y > 0.1 {
+                // info!("{:?} LeftStickY value is {}", gamepad, left_stick_y);
+                direction += Vec3::new(0.0, 1.0, 0.0)
+            }
         }
 
         // Are we moving?
@@ -178,11 +207,12 @@ pub fn animate_player_sprite(
     }
 }
 
+#[allow(dead_code)]
 pub fn gamepad_system(
     gamepads: Res<Gamepads>,
+    axes: Res<Axis<GamepadAxis>>,
     button_inputs: Res<ButtonInput<GamepadButton>>,
     button_axes: Res<Axis<GamepadButton>>,
-    axes: Res<Axis<GamepadAxis>>,
 ) {
     for gamepad in gamepads.iter() {
         if button_inputs.just_pressed(GamepadButton::new(gamepad, GamepadButtonType::South)) {

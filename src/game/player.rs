@@ -30,7 +30,7 @@ impl Plugin for PlayerPlugin {
                     confine_player_movement,
                     animate_player_sprite.run_if(in_state(PlayerState::Walking)),
                     player_catch_star,
-                    gamepad_system,
+                    // gamepad_system,
                 )
                     .run_if(in_state(AppState::Game))
                     .run_if(in_state(SimulationState::Running))
