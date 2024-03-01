@@ -24,7 +24,6 @@ impl Plugin for EnemyPlugin {
                     enemy_movement,
                     update_enemy_direction,
                     confine_enemy_movement,
-                    animate_enemy_sprite,
                     spawn_enemies_over_time,
                     enemy_hit_player,
                 )
@@ -32,6 +31,8 @@ impl Plugin for EnemyPlugin {
                     .run_if(in_state(AppState::Game))
                     .run_if(in_state(SimulationState::Running)),
             )
+            // always let the blobs bounce
+            .add_systems(Update, animate_enemy_sprite)
             // exit state systems
             .add_systems(OnExit(AppState::Game), despawn_enemies);
     }
