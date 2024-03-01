@@ -223,10 +223,10 @@ pub fn animate_enemy_sprite(
         for (mut sprite, enemy) in sprites_to_animate.iter_mut() {
             sprite.index = (sprite.index + 1) % 8;
             if *simulation_state.get() == SimulationState::Paused {
-                // use front facing sprites
+                // use front facing sprites when paused
                 sprite.index += 16
             } else {
-                // right facing enemy? use right facing sprites
+                // enemy moving to right? use right facing sprites
                 if enemy.direction.x > 0.0 {
                     sprite.index += 8;
                 }
