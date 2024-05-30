@@ -216,17 +216,21 @@ pub fn enemy_hit_player(
 pub fn animate_enemy_sprite(
     time: Res<Time>,
     mut enemy_animation_timer: ResMut<EnemyAnimationTimer>,
-    mut sprites_to_animate: Query<(&mut TextureAtlas, &Enemy)>,
+    mut enemies_to_animate: Query<(&mut TextureAtlas, &Enemy)>,
     simulation_state: Res<State<SimulationState>>,
 ) {
     if enemy_animation_timer.timer.tick(time.delta()).finished() {
-        for (mut sprite, enemy) in sprites_to_animate.iter_mut() {
+        // get the texture atlas and attributes for each enemy
+        for (mut sprite, enemy) in enemies_to_animate.iter_mut() {
+            // default to look left, then check if needs to be modified
             sprite.index = (sprite.index + 1) % 8;
             if *simulation_state.get() == SimulationState::Paused {
                 // use front facing sprites when paused
                 sprite.index += 16
             } else {
                 // enemy moving to right? use right facing sprites
+                // This could use the transform.rotation as in the Player systems instead, but as there is a 
+                // set of right-facing sprites already, this is used instead.
                 if enemy.direction.x > 0.0 {
                     sprite.index += 8;
                 }

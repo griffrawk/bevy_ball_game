@@ -130,7 +130,18 @@ pub fn player_movement(
             next_player_state.set(PlayerState::Paused);
         }
 
+        // Move the player
         player_transform.translation += direction * PLAYER_SPEED * time.delta_seconds();
+
+        // Flip the sprite on y-axis if travelling in the other direction.
+        // From https://stackoverflow.com/questions/63552301/how-to-flip-a-spritesheet-in-bevy
+        // Unlike the enemy sprite, the player sprite only faces one direction. 
+        if direction.x < 0.0 {
+            player_transform.rotation = Quat::from_rotation_y(std::f32::consts::PI);
+        } else if direction.x > 0.0 {
+            player_transform.rotation = Quat::default();
+        }
+        
     }
 }
 
