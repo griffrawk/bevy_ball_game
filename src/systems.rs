@@ -49,7 +49,7 @@ pub fn exit_game(
     mut app_exit_event_writer: EventWriter<AppExit>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Escape) {
-        app_exit_event_writer.send(AppExit);
+        app_exit_event_writer.send(AppExit::Success);
     }
 }
 
@@ -58,6 +58,6 @@ pub fn handle_game_over(
     mut game_over_event_reader: EventReader<GameOver>) {
     for event in game_over_event_reader.read() {
         println!("Final Score: {}", event.score);
-        commands.insert_resource(NextState(Some(AppState::GameOver)));
+        commands.insert_resource(NextState::Pending(AppState::GameOver));
     }
 }

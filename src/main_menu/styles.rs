@@ -1,10 +1,11 @@
 use bevy::prelude::*;
+use bevy::color::palettes::css::GOLD;
 
 // styles for the 'UI' ;-)
 
-pub const NORMAL_BUTTON_COLOR: Color = Color::rgb(0.15, 0.15, 0.15);
-pub const HOVERED_BUTTON_COLOR: Color = Color::rgb(0.25, 0.25, 0.25);
-pub const PRESSED_BUTTON_COLOR: Color = Color::rgb(0.35, 0.75, 0.35);
+pub const NORMAL_BUTTON_COLOR: Color = Color::srgb(0.15, 0.15, 0.15);
+pub const HOVERED_BUTTON_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
+pub const PRESSED_BUTTON_COLOR: Color = Color::srgb(0.35, 0.75, 0.35);
 
 // Some 0.11 changes in how ::DEFAULT is used in const, and size bits...
 // https://bevyengine.org/learn/migration-guides/0.10-0.11/#add-css-grid-support-to-bevy-ui
@@ -54,7 +55,7 @@ pub fn get_title_text_style(asset_server: &Res<AssetServer>) -> TextStyle {
     TextStyle {
         font: asset_server.load("fonts/FiraSans-Bold.ttf"),
         font_size: 64.0,
-        color: Color::GOLD,
+        color: GOLD.into(),
     }
 }
 
@@ -62,6 +63,6 @@ pub fn get_button_text_style(asset_server: &Res<AssetServer>) -> TextStyle {
     TextStyle {
         font: asset_server.load("fonts/FiraSans-Bold.ttf"),
         font_size: 30.0,
-        color: Color::GOLD,
+        color: GOLD.into(),
     }
 }

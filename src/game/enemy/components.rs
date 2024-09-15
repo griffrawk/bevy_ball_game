@@ -27,7 +27,7 @@ impl Default for Enemy {
 
 #[derive(AssetCollection, Resource)]
 pub struct EnemyAssets {
-    #[asset(texture_atlas_layout(tile_size_x = 64.0, tile_size_y = 64.0, columns = 8, rows = 3))]
+    #[asset(texture_atlas_layout(tile_size_x = 64, tile_size_y = 64, columns = 8, rows = 3))]
     pub enemy_layout: Handle<TextureAtlasLayout>,
     #[asset(image(sampler = nearest))]
     #[asset(path = "sprites/slime_jiggle.png")]

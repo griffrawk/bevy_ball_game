@@ -2,12 +2,17 @@
 name = "bevy_ball_game"
 version = "0.1.0"
 edition = "2021"
+description = "chase blobs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.13.0"
-bevy_asset_loader = {version = "0.20.0", features = ["2d"]}
-bevy_screen_diagnostics = "0.5.0"
+bevy = "0.14.2"
+# bevy = "0.13.0"
+bevy_asset_loader = {version = "0.21.0", features = ["2d"]}
+bevy_screen_diagnostics = "0.6.0"
 rand = "0.8.5"
 
+[package.metadata.bundle]
+identifier = "com.example.bevy_ball_game"
+resources = ["assets"]
