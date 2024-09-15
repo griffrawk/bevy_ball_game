@@ -8,7 +8,6 @@ description = "chase blobs"
 
 [dependencies]
 bevy = "0.14.2"
-# bevy = "0.13.0"
 bevy_asset_loader = {version = "0.21.0", features = ["2d"]}
 bevy_screen_diagnostics = "0.6.0"
 rand = "0.8.5"
