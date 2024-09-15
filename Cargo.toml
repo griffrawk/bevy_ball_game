@@ -2,7 +2,7 @@
 name = "bevy_ball_game"
 version = "0.1.0"
 edition = "2021"
-description = "chase blobs"
+description = "chase blobs as though you're indiana jones"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
