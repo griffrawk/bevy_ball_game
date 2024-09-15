@@ -14,8 +14,4 @@ rand = "0.8.5"
 
 [package.metadata.bundle]
 identifier = "com.example.bevy_ball_game"
-<<<<<<< HEAD
 resources = ["assets"]
-=======
-resources = ["assets"]
->>>>>>> 4d57a6baa5a0810cad4ada0d7b6994f10391a077
